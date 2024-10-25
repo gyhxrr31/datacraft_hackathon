@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from database import SessionLocal, engine, Base
 from models import Project, Task
 from schemas import Project, ProjectCreate, Task, TaskCreate
+from fastapi.middleware.cors import CORSMiddleware
 
 
 import crud
@@ -38,4 +39,13 @@ def read_project(project_id: int, db: Session = Depends(get_db)):
 
 @app.post('/tasks/', response_model=Task)
 def create_task(task: TaskCreate, db: Session = Depends(get_db)):
-    return crud.create_task(db=db, task=tasl)
+    return crud.create_task(db=db, task=task)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Разрешите запросы с клиентского порта
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
