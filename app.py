@@ -1,11 +1,17 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, File, UploadFile
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine, Base
 from models import Project, Task
 from schemas import Project, ProjectCreate, Task, TaskCreate
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import date
+
+
 import crud
+import csv
+import io
+
+
 
 # Инициализация базы данных
 Base.metadata.create_all(bind=engine)
@@ -68,6 +74,30 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
 @app.get("/api/report/", response_model=dict)
 def generate_report(db: Session = Depends(get_db)):
     projects = crud.get_projects(db)
+
+
+@app.post("/api/upload-csv/")
+async def upload_csv(file: UploadFile = File(...)):
+    if not file.filename.endswith(".csv"):
+        raise HTTPException(status_code=400, detail="Файл должен быть в формате CSV.")
+
+    # Чтение и обработка содержимого CSV файла
+    content = await file.read()
+    data = []
+
+    try:
+        # Декодируем контент и читаем через csv.reader
+        csv_reader = csv.reader(io.StringIO(content.decode("utf-8")))
+        for row in csv_reader:
+            data.append(row)
+        
+        # Здесь можно добавить логику для сохранения данных в БД
+        print("Содержимое CSV файла:", data)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Ошибка при обработке файла: {e}")
+
+    return {"message": "Файл успешно обработан", "data": data}
+
 
     # Проверка, если проекты не найдены
     if not projects:
