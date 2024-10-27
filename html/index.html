@@ -75,7 +75,11 @@
             <canvas id="reportChart"></canvas>
         </div>
     </div>
-    
+    <h2>Загрузите файл CSV</h2>
+    <form id="uploadForm">
+        <input type="file" id="csvFileInput" name="file" accept=".csv">
+        <button type="submit">Загрузить</button>
+    </form>
     <!-- Подключаем библиотеку Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
