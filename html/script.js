@@ -101,3 +101,37 @@ function renderChart(data) {
         }
     });
 }
+
+document.getElementById("uploadForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const fileInput = document.getElementById("csvFileInput");
+    const file = fileInput.files[0];
+
+    if (!file) {
+        alert("Пожалуйста, выберите файл перед загрузкой.");
+        return;
+    }
+
+    // Создаем FormData и добавляем файл
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+        const response = await fetch("http://localhost:8000/api/upload-csv/", {
+            method: "POST",
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error("Ошибка загрузки файла.");
+        }
+
+        const result = await response.json();
+        console.log("Файл успешно загружен:", result);
+        alert("Файл успешно загружен!");
+    } catch (error) {
+        console.error("Ошибка:", error);
+        alert("Произошла ошибка при загрузке файла.");
+    }
+});
